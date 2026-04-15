@@ -150,6 +150,20 @@ app.post('/api/create-folder', express.json(), (req, res) => {
   }
 });
 
+app.get("/api/csv", (req, res) => {
+  const { folder, file } = req.query;
+
+  if (!folder || !file) {
+    return res.status(400).json({ error: "folder and file required" });
+  }
+
+  const tunnelUrl = "https://healthy-mainly-api-dice.trycloudflare.com";
+
+  const target = `${tunnelUrl}/days/${folder}/${file}`;
+
+  res.redirect(target);
+});
+
 // ============================
 // 🚀 Start Server
 // ============================
