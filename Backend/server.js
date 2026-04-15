@@ -10,7 +10,8 @@ const DAYS_PATH = path.join(process.cwd(), 'days');
 app.use("/days", express.static(DAYS_PATH));
 app.use("/api", uploadRouter);
 // 🔥 path ไปยัง frontend/public
-const FRONTEND_PUBLIC = path.join(process.cwd(), '/days');
+// const FRONTEND_PUBLIC = path.join(process.cwd(), '/days');
+const FRONTEND_PUBLIC = path.join(process.cwd(), 'days');
 const PYTHON_SCRIPT = path.join(process.cwd(), 'ETL.py'); // ✅ เพิ่ม
 
 // ============================
