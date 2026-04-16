@@ -3,15 +3,15 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 const router = express.Router();
-
+const BASE_PATH = path.join(process.cwd(), "days");
 
 const storage = multer.diskStorage({
 destination: (req, file, cb) => {
-  const uploadPath = path.join(
-    process.cwd(),
-    "../Frontend/public"
-  );
-
+  // const uploadPath = path.join(
+  //   process.cwd(),
+  //   "../Frontend/public"
+  // );
+const uploadPath = BASE_PATH;
   cb(null, uploadPath);
 },
 
@@ -24,12 +24,12 @@ const upload = multer({ storage });
 router.post("/upload", upload.single("file"), (req, res) => {
   const folder = req.body.folder || "";
 
-  const targetDir = path.join(
-    process.cwd(),
-    "../Frontend/public",
-    folder
-  );
-
+  // const targetDir = path.join(
+  //   process.cwd(),
+  //   "../Frontend/public",
+  //   folder
+  // );
+const targetDir = path.join(BASE_PATH, folder);
   fs.mkdirSync(targetDir, { recursive: true });
 
   const oldPath = req.file.path;
