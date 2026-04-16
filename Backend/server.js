@@ -18,7 +18,12 @@ const PYTHON_SCRIPT = path.join(process.cwd(), 'ETL.py'); // ✅ เพิ่ม
 // 📁 GET: list folders (ระดับบน)
 // ============================
 app.get('/api/folders', (req, res) => {
-  const dirs = fs.readdirSync(FRONTEND_PUBLIC, { withFileTypes: true })
+  // const dirs = fs.readdirSync(FRONTEND_PUBLIC, { withFileTypes: true })
+  if (!fs.existsSync(FRONTEND_PUBLIC)) {
+  return res.json([]);
+}
+
+const dirs = fs.readdirSync(FRONTEND_PUBLIC, { withFileTypes: true })
     .filter(d => d.isDirectory())
     .map(d => d.name);
 
@@ -28,17 +33,47 @@ app.get('/api/folders', (req, res) => {
 // ============================
 // 📂 GET: อ่านไฟล์ในโฟลเดอร์
 // ============================
-app.get('/api/files', (req, res) => {
-  const folder = req.query.folder; // เช่น 2568/204
+// app.get('/api/files', (req, res) => {
+//   // ฝฃconst folder = req.query.folder; // เช่น 2568/204
+//   const folder = req.query.folder || '';
 
-  if (!folder) {
-    return res.status(400).json({ error: 'folder is required' });
-  }
+//   // if (!folder) {
+//   //   return res.status(400).json({ error: 'folder is required' });
+//   // }
+
+//   const targetDir = path.join(FRONTEND_PUBLIC, folder);
+
+//   if (!fs.existsSync(targetDir)) {
+//     return res.status(404).json({ error: 'folder not found' });
+//   }
+
+//   const files = fs.readdirSync(targetDir)
+//     .filter(name => !name.startsWith('.'))
+//     .map(name => {
+//       const fullPath = path.join(targetDir, name);
+//       const stat = fs.statSync(fullPath);
+
+//       return {
+//         name,
+//         size: stat.size,
+//         type: path.extname(name),
+//         url: `/${folder}/${name}`, // ใช้เปิดไฟล์
+//       };
+//     });
+
+//   res.json(files);
+// });
+app.get('/api/files', (req, res) => {
+  let folder = req.query.folder || '';
+
+  // ✅ ตัด / หน้าออก
+  folder = folder.replace(/^\//, '');
 
   const targetDir = path.join(FRONTEND_PUBLIC, folder);
 
+  // ✅ ถ้าไม่มี folder → return [] แทน error
   if (!fs.existsSync(targetDir)) {
-    return res.status(404).json({ error: 'folder not found' });
+    return res.json([]);
   }
 
   const files = fs.readdirSync(targetDir)
@@ -51,13 +86,12 @@ app.get('/api/files', (req, res) => {
         name,
         size: stat.size,
         type: path.extname(name),
-        url: `/${folder}/${name}`, // ใช้เปิดไฟล์
+        url: `/${folder}/${name}`,
       };
     });
 
   res.json(files);
 });
-
 // ============================
 // 🗑️ DELETE: ลบไฟล์จริง
 // ============================
@@ -93,8 +127,9 @@ app.delete('/api/files', (req, res) => {
 // 🔄 POST: convert .25o → CSV
 // ============================
 app.post('/api/convert', express.json(), (req, res) => {
-  const { folder } = req.body;
-
+  // const { folder } = req.body;
+let { folder } = req.body;
+folder = folder?.replace(/^\//, '') || '';
   if (!folder) {
     return res.status(400).json({ error: 'folder is required' });
   }
@@ -158,7 +193,7 @@ app.get("/api/csv", (req, res) => {
     return res.status(400).json({ error: "folder and file required" });
   }
 
-  const tunnelUrl = "https://crops-covers-protocols-slot.trycloudflare.com";
+  const tunnelUrl = "https://assessment-cute-configure-alphabetical.trycloudflare.com";
 
   const target = `${tunnelUrl}/days/${folder}/${file}`;
 
