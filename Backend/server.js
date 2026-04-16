@@ -81,12 +81,14 @@ app.get('/api/files', (req, res) => {
     .map(name => {
       const fullPath = path.join(targetDir, name);
       const stat = fs.statSync(fullPath);
-
+const BASE_URL = "https://covered-telephone-editorials-sheep.trycloudflare.com";
       return {
         name,
         size: stat.size,
         type: path.extname(name),
-        url: `/${folder}/${name}`,
+        // url: `/${folder}/${name}`,
+
+         url: `${BASE_URL}/days/${folder}/${name}`,
       };
     });
 
@@ -194,6 +196,7 @@ app.get("/api/csv", (req, res) => {
   }
 
   const tunnelUrl = "https://covered-telephone-editorials-sheep.trycloudflare.com";
+  
 
   const target = `${tunnelUrl}/days/${folder}/${file}`;
 
