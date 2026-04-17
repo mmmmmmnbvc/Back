@@ -81,7 +81,7 @@ app.get('/api/files', (req, res) => {
     .map(name => {
       const fullPath = path.join(targetDir, name);
       const stat = fs.statSync(fullPath);
-const BASE_URL = "https://covered-telephone-editorials-sheep.trycloudflare.com";
+const BASE_URL = " https://estates-somerset-fully-deck.trycloudflare.com";
       return {
         name,
         size: stat.size,
@@ -195,7 +195,7 @@ app.get("/api/csv", (req, res) => {
     return res.status(400).json({ error: "folder and file required" });
   }
 
-  const tunnelUrl = "https://covered-telephone-editorials-sheep.trycloudflare.com";
+  const tunnelUrl = " https://estates-somerset-fully-deck.trycloudflare.com";
   
 
   const target = `${tunnelUrl}/days/${folder}/${file}`;
