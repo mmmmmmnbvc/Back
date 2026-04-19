@@ -5,7 +5,7 @@ from pathlib import Path
 from multiprocessing import Pool, cpu_count
 
 SUPPORTED_EXT = ".25o"
-DEBUG = False  # 🔥 ปิด log เพื่อความเร็ว
+DEBUG = False
 
 TARGET_COLUMNS = [
     "time", "sv", 
@@ -21,9 +21,9 @@ TARGET_COLUMNS = [
 ]
 
 
-# =========================
-# HEADER PARSE
-# =========================
+
+#header
+
 def extract_obs_types(lines):
     obs_map = {}
     i = 0
@@ -52,9 +52,9 @@ def extract_obs_types(lines):
     return obs_map, i + 1
 
 
-# =========================
-# FORMAT TIME (🔥 แก้ตรงนี้)
-# =========================
+
+#format เวลา
+
 def format_time(parts):
     try:
         year = int(parts[1])
@@ -64,10 +64,10 @@ def format_time(parts):
         hour = int(parts[4])
         minute = int(parts[5])
 
-        # 🔥 ตัดทศนิยม + ปัดวินาที
+        #ปัดเศษวินาที
         second = int(round(float(parts[6])))
 
-        # 🔥 handle overflow เช่น 59.999999 → 60
+        #ตัดเลขเกิน
         if second == 60:
             second = 0
             minute += 1
@@ -80,16 +80,15 @@ def format_time(parts):
             hour = 0
             day += 1
 
-        # 🔥 format: 2025-12-5 18:59:59
         return f"{year}-{month}-{day} {hour:02}:{minute:02}:{second:02}"
 
     except:
         return None
 
 
-# =========================
-# CORE PARSER
-# =========================
+
+#core
+
 def parse_rinex(file_path):
     with open(file_path, 'r', encoding='latin-1', errors='ignore') as f:
         lines = f.readlines()
@@ -102,14 +101,14 @@ def parse_rinex(file_path):
     while i < len(lines):
         line = lines[i]
 
-        # ===== EPOCH =====
+        #epoch
         if line.startswith(">"):
             p = line.split()
             current_time = format_time(p)  # 🔥 ใช้ function ใหม่
             i += 1
             continue
 
-        # ===== SKIP =====
+        #skip
         if not current_time or len(line) < 3:
             i += 1
             continue
@@ -127,7 +126,7 @@ def parse_rinex(file_path):
         obs_types = obs_map[sys_code]
         expected_len = len(obs_types)
 
-        # ===== READ VALUES =====
+        #อ่านข้อมูล
         values = []
         chunk = line[3:]
         values.extend([chunk[j:j+16].strip() for j in range(0, len(chunk), 16)])
@@ -148,7 +147,6 @@ def parse_rinex(file_path):
             values.extend([chunk[j:j+16].strip() for j in range(0, len(chunk), 16)])
             i += 1
 
-        # ===== MAP =====
         row = {col: None for col in TARGET_COLUMNS}
         row["time"] = current_time
         row["sv"] = sv
@@ -172,17 +170,15 @@ def parse_rinex(file_path):
     if df.empty:
         return df
 
-    # ===== REMOVE DUP =====
+    #remove dup
     df = df.drop_duplicates(subset=["time", "sv"])
 
-    # ===== COLUMN ORDER =====
     for col in TARGET_COLUMNS:
         if col not in df.columns:
             df[col] = None
 
     df = df[TARGET_COLUMNS]
-
-    # ===== OPTIMIZE =====
+    
     for col in df.columns:
         if col not in ["time", "sv"]:
             df[col] = pd.to_numeric(df[col], errors='coerce', downcast='float')
@@ -190,9 +186,9 @@ def parse_rinex(file_path):
     return df
 
 
-# =========================
-# PROCESS FILE
-# =========================
+
+#process
+
 def process_file(file_path):
     output_path = Path(file_path).with_suffix(".csv")
 
@@ -207,12 +203,12 @@ def process_file(file_path):
     df.to_csv(output_path, index=False, float_format="%.6f")
 
     if DEBUG:
-        print(f"[DONE] {output_path} rows={len(df)} - etl_gnss.py:210")
+        print(f"[DONE] {output_path} rows={len(df)}  etl_gnss.py:210 - ETL.py:206")
 
 
-# =========================
-# BULK
-# =========================
+
+#execute Mode // bulk
+
 def bulk_run(root_folder):
     files = list(Path(root_folder).rglob(f"*{SUPPORTED_EXT}"))
 
@@ -222,15 +218,12 @@ def bulk_run(root_folder):
         return
 
     workers = min(cpu_count(), len(files))
-    # print(f"[USING {workers} CORES] - etl_gnss.py:225")
 
     with Pool(workers) as p:
         p.map(process_file, [str(f) for f in files])
 
+#main
 
-# =========================
-# MAIN
-# =========================
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--bulk")
@@ -240,7 +233,7 @@ def main():
     if args.bulk:
         bulk_run(args.bulk)
     else:
-        print("Usage: python  bulk <folder> - etl_gnss.py:243")
+        print("Usage: python  bulk <folder>  etl_gnss.py:243 - ETL.py:236")
 
 
 if __name__ == "__main__":

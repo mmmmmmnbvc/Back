@@ -12,7 +12,7 @@ export async function getFiles() {
 
 export async function getCSV(day, file) {
 
-  const filePath = `${day}/${file}`;   // ✅ เปลี่ยนชื่อ
+  const filePath = `${day}/${file}`;   //  เปลี่ยนชื่อ
 
   console.log("Loading:", filePath);
 
