@@ -13,7 +13,7 @@ app.use("/api", uploadRouter);
 // const FRONTEND_PUBLIC = path.join(process.cwd(), '/days');
 const FRONTEND_PUBLIC = path.join(process.cwd(), 'days'); //path เก็บไฟล์จริง
 const PYTHON_SCRIPT = path.join(process.cwd(), 'ETL.py'); // ไฟล์ Python ETL
-const BASE_URL = "https://hiking-treated-elephant-lyrics.trycloudflare.com"; //Cloudflare tunnel
+const BASE_URL = "https://lynn-directory-flow-walker.trycloudflare.com"; //Cloudflare tunnel
 
 //  อ่าน folders
 //เช็คว่ามีfolder ใน days ไหม
